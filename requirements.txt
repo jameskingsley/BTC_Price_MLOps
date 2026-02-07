@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+prefect
+clearml
+yfinance
+pandas
+numpy
+joblib
+scikit-learn
+streamlit
+plotly
+requests

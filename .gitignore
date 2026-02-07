@@ -1,0 +1,26 @@
+# Python environment
+venv/
+.venv/
+env/
+bin/
+lib/
+include/
+
+# Caches and logs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.prefect/
+.clearml/
+*.log
+
+# Data and Models
+data/*.csv
+data/*.pkl
+data/*.json
+!data/.gitkeep
+
+# Sensitive info
+.env
+.secrets

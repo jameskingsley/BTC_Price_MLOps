@@ -27,30 +27,33 @@ def load_latest_model():
     global current_model, current_model_id
     try:
         # Search for the latest task in the project
-        # Including 'running' ensures we get the latest model even if the task hasn't closed
+        # 'in_progress' is the correct status for tasks currently running
         last_task = Task.get_task(
             project_name="BTC_MLOps", 
             task_name="Train_RandomForest",
-            task_filter={'status': ['completed', 'running']}
+            task_filter={'status': ['completed', 'in_progress']}
         )
         
         if last_task and last_task.id != current_model_id:
-            print(f"New task found! ID: {last_task.id}. Checking for artifact...")
+            print(f"✨ New task found! ID: {last_task.id}. Checking for artifact...")
             
-            # Accessing the artifact named 'btc_prediction_model' from the dashboard
-            if 'btc_prediction_model' in last_task.artifacts:
+            # Access the artifact by the specific name seen in the dashboard
+            artifact = last_task.artifacts.get('btc_prediction_model')
+            
+            if artifact:
                 print(f"Downloading artifact: btc_prediction_model...")
-                artifact = last_task.artifacts['btc_prediction_model']
-                
                 # Download to local cache and load
                 new_model_path = artifact.get_local_copy()
                 current_model = joblib.load(new_model_path)
                 current_model_id = last_task.id
                 print(f"API successfully updated to model ID: {current_model_id}")
             else:
-                # If the name is different, this lists available keys in your logs
+                # Useful for debugging if the name changes
                 available = list(last_task.artifacts.keys())
-                print(f"Artifact 'btc_prediction_model' not found. Available keys: {available}")
+                print(f"Task found, but 'btc_prediction_model' not found yet. Available: {available}")
+        
+        elif not last_task:
+            print("No tasks matching 'Train_RandomForest' found in project 'BTC_MLOps'.")
                 
     except Exception as e:
         print(f"ClearML Sync Error: {e}")
@@ -79,6 +82,7 @@ async def predict(data: list):
         return {"error": "Model not loaded. ClearML sync in progress..."}
     
     # Ensuring data is provided as a 2D array for Scikit-learn
+    # Wraps input 'data' in another list to match the model's expected shape
     prediction = current_model.predict([data])
     return {"prediction_usd": float(prediction[0])}
 

@@ -33,6 +33,6 @@ def persist_data(df: pd.DataFrame, filename: str = "data/raw/btc_raw.csv"):
 def run_ingestion():
     data = fetch_btc_data()
     persist_data(data)
-
+ 
 if __name__ == "__main__":
     run_ingestion()
